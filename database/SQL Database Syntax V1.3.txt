@@ -1,0 +1,79 @@
+
+CREATE TABLE Users (
+    Userid INT AUTO_INCREMENT,
+    Fname VARCHAR(255) NOT NULL,
+    Lname VARCHAR(255) NOT NULL,
+    PhoneNumber VARCHAR(15),
+    Address TEXT,
+    Username VARCHAR(255) NOT NULL UNIQUE,
+    Email VARCHAR(255) NOT NULL,
+    Password VARCHAR(255) NOT NULL,
+    PRIMARY KEY (Userid)
+);
+
+CREATE TABLE Product (
+    Productid INT NOT NULL AUTO_INCREMENT,
+    Price INT NOT NULL,
+    Name VARCHAR(255) NOT NULL,
+    Category VARCHAR(255) NOT NULL,
+    PRIMARY KEY (Productid)
+);
+
+CREATE TABLE Cart (
+    Cartid INT NOT NULL AUTO_INCREMENT,
+    Userid INT NOT NULL,
+    PRIMARY KEY (Cartid),
+    FOREIGN KEY (Userid) REFERENCES Users(Userid) ON DELETE CASCADE
+);
+
+CREATE TABLE PaymentMethods (
+    PaymentID INT NOT NULL AUTO_INCREMENT,
+    Userid INT NOT NULL,
+    CardNumber VARCHAR(16) NOT NULL,
+    ExpirationDate DATE NOT NULL,
+    CVV VARCHAR(3) NOT NULL,
+    CardholderName VARCHAR(255) NOT NULL,
+    PRIMARY KEY (PaymentID),
+    FOREIGN KEY (Userid) REFERENCES Users(Userid) ON DELETE CASCADE
+);
+
+CREATE TABLE Orders (
+    Transactionid INT NOT NULL AUTO_INCREMENT,
+    Status ENUM('Pending', 'Completed', 'Cancelled') NOT NULL,
+    Orderdate DATE NOT NULL,
+    TotalPrice DECIMAL(10,2) NOT NULL,
+    Userid INT NOT NULL,
+    PaymentID INT NOT NULL,
+    PRIMARY KEY (Transactionid),
+    FOREIGN KEY (Userid) REFERENCES Users(Userid) ON DELETE CASCADE,
+    FOREIGN KEY (PaymentID) REFERENCES PaymentMethods(PaymentID) ON DELETE CASCADE
+);
+
+CREATE TABLE Seller (
+    SellerID INT NOT NULL AUTO_INCREMENT,
+    StockQuantity INT NOT NULL,
+    Price INT NOT NULL,
+    Userid INT NOT NULL,
+    Productid INT NOT NULL,
+    PRIMARY KEY (SellerID),
+    FOREIGN KEY (Userid) REFERENCES Users(Userid) ON DELETE CASCADE,
+    FOREIGN KEY (Productid) REFERENCES Product(Productid) ON DELETE CASCADE
+);
+
+CREATE TABLE Added_to (
+    Quantity INT NOT NULL,
+    Productid INT NOT NULL,
+    Cartid INT NOT NULL,
+    PRIMARY KEY (Productid, Cartid),
+    FOREIGN KEY (Productid) REFERENCES Product(Productid) ON DELETE CASCADE,
+    FOREIGN KEY (Cartid) REFERENCES Cart(Cartid) ON DELETE CASCADE
+);
+
+CREATE TABLE Includes (
+    Totalprice INT NOT NULL,
+    Productid INT NOT NULL,
+    Transactionid INT NOT NULL,
+    PRIMARY KEY (Productid, Transactionid),
+    FOREIGN KEY (Productid) REFERENCES Product(Productid) ON DELETE CASCADE,
+    FOREIGN KEY (Transactionid) REFERENCES Orders(Transactionid) ON DELETE CASCADE
+);
